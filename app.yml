@@ -1,13 +1,14 @@
-runtime: python39  # Specifies the runtime environment. In this case, Python 3.9
-entrypoint: gunicorn -b :$PORT main:app  # Defines the entry point for the application. Adjust according to your app server and application.
+runtime: python39
+service: demo-cicd-django
+entrypoint: gunicorn -b :$PORT app_engine.wsgi:application
 
-# [Optional] Instance Class Configuration
-instance_class: F1  # Defines the instance class (compute resources). F1 is the smallest available instance class.
+instance_class: F1
 
-# [Optional] Resource Files
 handlers:
-- url: /static  # URL path for static files
-  static_dir: static/  # Directory within your project that contains static files.
+- url: /static
+  static_dir: static/
+- url: /.*
+  script: auto
 
-- url: /.*  # Catch-all handler to serve a web application.
-  script: auto  # Automatically route requests to your applicatio
+env_variables:
+  DJANGO_SETTINGS_MODULE: app_engine.settings
