@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+from urllib.parse import urlparse
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,9 +25,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-qkx$&-z39#lg3!rdx==z&b!aib+qjyre5@va1wk*!u_rs11s_p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+if os.environ.get("APP_ENGINE_URL", None) and not DEBUG:
+    APP_ENGINE_URL = os.environ.get("APP_ENGINE_URL")
+    if not urlparse(APP_ENGINE_URL).scheme:
+        APP_ENGINE_URL = f"https://{APP_ENGINE_URL}"
+    ALLOWED_HOSTS = [urlparse(APP_ENGINE_URL).netloc]
+    CSRF_TRUSTED_ORIGINS = [APP_ENGINE_URL]
+    SECURE_SSL_REDIRECT = True
+else:
+    ALLOWED_HOSTS = ['*']
 
 
 # Application definition
